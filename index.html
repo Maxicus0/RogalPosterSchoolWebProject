@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Рядовой Сергей Рогаль — интерактивный плакат</title>
+<meta name="description" content="Интерактивный плакат о земляке-афганце, рядовом Сергее Рогале (д. Ласицк Пинского района, 1966–1985).">
+<meta property="og:title" content="Рядовой Сергей Рогаль — интерактивный плакат">
+<link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
+<style>
+:root{--desk:#b4b79d;--ink:#1d2433;--pen:#243a8c;--star:#a82a22;--paper:#f3efe0;--olive:#4d5a3a;--shadow:0 6px 14px rgba(30,32,20,.35);
+--serif:"Old Standard TT",Georgia,"Times New Roman",serif;--sans:"PT Sans",Arial,sans-serif;--hand:"Marck Script","Segoe Script",cursive}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--desk);color:var(--ink);font:17px/1.55 var(--sans);min-height:100vh}
+a{color:#7a1d17}
+:focus-visible{outline:3px solid var(--pen);outline-offset:4px}
+header{max-width:1180px;margin:0 auto;padding:36px 24px 8px}
+h1{font:700 clamp(46px,9vw,104px)/.95 var(--serif);margin:0;letter-spacing:-.01em}
+.dates{font:italic 400 clamp(20px,3vw,30px) var(--serif);margin:10px 0 0}
+.lead{max-width:56ch;margin:16px 0 0;font-size:18px}
+.hand{font:400 26px/1.2 var(--hand);color:var(--pen);margin:18px 0 0;transform:rotate(-1deg);transform-origin:left}
+.board{max-width:1180px;margin:18px auto 0;padding:20px 24px 30px;display:grid;gap:10px 18px;
+ grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(210px,auto);
+ grid-template-areas:"p p v v l l" "p p r r t t" "a m r r i s"}
+.item{background:none;border:0;padding:8px;cursor:pointer;color:inherit;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+ transform:rotate(var(--r,0deg));transition:transform .18s}
+.item:hover,.item:focus-visible{transform:rotate(0) translateY(-5px)}
+.item svg{display:block;width:100%;height:auto;filter:drop-shadow(0 5px 6px rgba(30,32,20,.4))}
+.cap{font:400 25px/1 var(--hand);color:var(--pen)}
+.item.seen .cap::after,.item.seen .name::after{content:" ✓";color:var(--star)}
+[data-id=portrait]{grid-area:p;--r:-2deg}[data-id=village]{grid-area:v;--r:1.5deg}[data-id=letters]{grid-area:l;--r:-3deg}
+[data-id=route]{grid-area:r;--r:1deg}[data-id=truck]{grid-area:t;--r:2deg}[data-id=award]{grid-area:a;--r:3deg}
+[data-id=media]{grid-area:m;--r:-2deg}[data-id=island]{grid-area:i;--r:-1.5deg}[data-id=sources]{grid-area:s;--r:2.5deg}
+.polaroid{position:relative;background:#fbf9f1;padding:12px 12px 40px;box-shadow:var(--shadow);width:min(100%,330px)}
+.polaroid .ph{position:relative;aspect-ratio:3/4;background:#7d8179;overflow:hidden}
+.polaroid .ph svg{position:absolute;inset:0;filter:none}
+.polaroid img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(1) contrast(1.05)}
+.polaroid::before{content:"";position:absolute;top:-12px;left:50%;width:90px;height:26px;margin-left:-45px;background:rgba(235,214,120,.75);transform:rotate(-3deg)}
+.polaroid::after{content:"";position:absolute;top:0;right:0;width:74px;height:74px;background:#0d0d0d;clip-path:polygon(100% 0,0 0,100% 100%)}
+.polaroid .name{position:absolute;left:0;right:0;bottom:8px;text-align:center;font:400 22px var(--hand);color:var(--pen)}
+.sign{width:min(100%,290px);background:#1b4e8f;border:5px solid #fff;outline:3px solid #1b4e8f;border-radius:8px;color:#fff;text-align:center;padding:16px 10px;font:700 30px/1.1 var(--sans);box-shadow:var(--shadow)}
+.sign small{display:block;font:400 17px var(--sans);margin-top:6px;opacity:.9}
+.scrim{position:fixed;inset:0;background:rgba(20,22,14,.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(480px,100vw);background:var(--paper);box-shadow:-8px 0 24px rgba(0,0,0,.35);transform:translateX(104%);visibility:hidden;transition:transform .25s ease,visibility .25s;z-index:11;display:flex;flex-direction:column}
+.drawer.on{transform:none;visibility:visible}
+.drawer-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;padding:22px 22px 12px;border-bottom:2px solid var(--ink)}
+.drawer h2{font:700 30px/1.1 var(--serif);margin:0}
+.sub{margin:6px 0 0;font:italic 400 16px var(--serif);color:#4a4a3e}
+.close{flex:none;background:none;border:2px solid var(--ink);width:40px;height:40px;font-size:24px;line-height:1;cursor:pointer;color:var(--ink);border-radius:50%}
+.close:hover{background:var(--ink);color:var(--paper)}
+.drawer-body{padding:18px 22px 30px;overflow-y:auto;flex:1}
+.drawer-body p{margin:0 0 14px}.drawer-body ul{padding-left:20px}
+.tl{list-style:none;padding:0;margin:0 0 16px;border-left:2px solid var(--ink)}
+.tl li{position:relative;padding:0 0 12px 18px}
+.tl li::before{content:"";position:absolute;left:-6px;top:.55em;width:10px;height:10px;background:var(--star);border-radius:50%}
+.tl b{font-family:var(--serif);font-size:19px;margin-right:8px}
+.fact{border-left:5px solid var(--star);background:#e8e2cd;padding:10px 14px;margin:0 0 14px}
+.note{font-size:15px;color:#55554a}
+.letter{font:400 26px/1.4 var(--hand);color:var(--pen);background:repeating-linear-gradient(transparent 0 35px,#b9c3d9 35px 36px);padding:2px 12px 8px;margin:0 0 14px}
+.letter small{display:block;font:400 14px var(--sans);color:#55554a;margin-top:8px;background:var(--paper)}
+.portrait{margin:0 0 14px}.portrait img{width:100%;max-height:420px;object-fit:cover;filter:grayscale(1)}
+.badge{display:flex;gap:14px;align-items:center;border:2px solid var(--ink);padding:12px;margin:0 0 12px}
+.links{border-top:2px solid var(--ink);margin-top:20px;padding-top:12px}
+.links h3{font:700 19px var(--serif);margin:0 0 8px}
+.links a{display:block;margin-bottom:8px;font-size:15px;word-break:break-word}
+.links span{display:block;font-size:13px;color:#55554a}
+.route{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.route a{border:2px solid var(--ink);padding:3px 12px;text-decoration:none;color:var(--ink);font-size:15px}
+.route a:hover{background:var(--ink);color:var(--paper)}
+.video{position:relative;aspect-ratio:16/9;background:#000;margin:0 0 14px}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+footer{max-width:1180px;margin:0 auto;padding:0 24px 44px;font-size:15px}footer p{max-width:70ch;margin:0}
+@media (max-width:760px){
+ .board{grid-template-columns:1fr 1fr;grid-template-areas:none;grid-auto-rows:auto}
+ .item{grid-area:auto!important}[data-id=portrait]{grid-column:1/-1!important}[data-id=route]{grid-column:1/-1!important}
+ .drawer{top:auto;bottom:0;width:100%;height:80vh;transform:translateY(104%);border-radius:14px 14px 0 0}.drawer.on{transform:none;visibility:visible}}
+@media (prefers-reduced-motion:reduce){.item,.drawer,.scrim{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Сергей Рогаль</h1>
+  <p class="dates">30 марта 1966 — 23 августа 1985</p>
+  <p class="lead">Рядовой, водитель. Родом из деревни Ласицк Пинского района. Погиб в Афганистане за рулём головной машины колонны. Ему было девятнадцать.</p>
+  <p class="hand">Откройте предметы на столе: за каждым — рассказ, документ или ссылка на источник.</p>
+</header>
+<main class="board" aria-label="Предметы плаката">
+  <button class="item" data-id="portrait"><div class="polaroid"><div class="ph"><svg viewBox="0 0 30 40" aria-hidden="true"><rect width="30" height="40" fill="#8a8e86"/><circle cx="15" cy="15" r="6" fill="#5b5f59"/><path d="M3,40 Q15,22 27,40Z" fill="#5b5f59"/></svg><img src="assets/rogal.jpg" alt="Портрет Сергея Рогаля" onerror="this.remove()"></div><span class="name">Сергей, 19 лет</span></div></button>
+  <button class="item" data-id="village"><div class="sign">д. Ласицк<small>Пинский район</small></div><span class="cap">Откуда он родом</span></button>
+  <button class="item" data-id="letters"><svg viewBox="0 0 240 160" aria-hidden="true"><rect x="4" y="4" width="232" height="152" fill="#e7dcb8" stroke="#8d7d52" stroke-width="2"/><path d="M4,4 L120,92 L236,4 M4,156 L96.5,74.2 M236,156 L143.5,74.2" fill="none" stroke="#8d7d52" stroke-width="2"/><rect x="176" y="14" width="46" height="56" fill="#f6f1de" stroke="#a82a22" stroke-width="2" stroke-dasharray="3 2"/><polygon transform="translate(199,42) scale(1.4)" points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4" fill="#a82a22"/></svg><span class="cap">Письма домой</span></button>
+  <button class="item" data-id="route"><svg viewBox="0 0 400 260" aria-hidden="true"><rect width="400" height="260" fill="#d9d1ae" stroke="#7d7450" stroke-width="2"/><g fill="none" stroke="#9a8d5c" stroke-width="1.4"><ellipse cx="130" cy="150" rx="110" ry="70"/><ellipse cx="130" cy="150" rx="80" ry="46"/><ellipse cx="130" cy="150" rx="46" ry="22"/><ellipse cx="300" cy="80" rx="90" ry="50"/><ellipse cx="300" cy="80" rx="55" ry="28"/></g><path d="M200,0 V260 M0,130 H400" stroke="#fff" stroke-opacity=".25" stroke-width="3"/><path d="M70,205 C130,170 150,150 215,135 S300,95 340,40" fill="none" stroke="#a82a22" stroke-width="3.5" stroke-dasharray="9 6"/><circle cx="70" cy="205" r="6" fill="#a82a22"/><circle cx="340" cy="40" r="6" fill="#a82a22"/><text x="84" y="228" font-family="Marck Script,cursive" font-size="24" fill="#1d2433">Кабул</text><text x="262" y="30" font-family="Marck Script,cursive" font-size="24" fill="#1d2433">Термез</text></svg><span class="cap">Дороги Афганистана</span></button>
+  <button class="item" data-id="truck"><svg viewBox="0 0 340 190" aria-hidden="true"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8c79a"/><stop offset="1" stop-color="#ecdcb0"/></linearGradient></defs><rect width="340" height="190" fill="url(#sk)"/><path d="M0,112 L48,68 L86,98 L140,52 L200,104 L252,72 L340,118 V150 H0Z" fill="#a39870"/><path d="M0,128 L60,96 L120,120 L190,86 L260,122 L340,100 V150 H0Z" fill="#847a58"/><rect y="146" width="340" height="44" fill="#5b523c"/><path d="M0,182 H340" stroke="#d8c79a" stroke-width="3" stroke-dasharray="26 18" opacity=".55"/><ellipse cx="160" cy="167" rx="150" ry="6" fill="#2a2418" opacity=".35"/><g fill="#d9cba3" opacity=".8"><ellipse cx="14" cy="160" rx="30" ry="12"/><ellipse cx="34" cy="148" rx="22" ry="14"/></g><g transform="translate(18,28)"><g fill="#0c0d09"><circle cx="67" cy="112" r="22"/><circle cx="115" cy="112" r="22"/><circle cx="249" cy="112" r="22"/></g><g fill="#2a2b21"><circle cx="67" cy="112" r="8"/><circle cx="115" cy="112" r="8"/><circle cx="249" cy="112" r="8"/></g><rect x="4" y="100" width="266" height="10" fill="#22231b"/><path d="M6,100 V62 Q6,50 18,50 H188 Q202,50 202,62 V100Z" fill="#5d6842"/><path d="M42,51 V100 M80,51 V100 M118,51 V100 M156,51 V100" stroke="#47532f" stroke-width="3"/><rect x="6" y="86" width="196" height="14" fill="#6b5a3e"/><path d="M6,93 H202" stroke="#4d4129" stroke-width="2"/><rect x="2" y="92" width="4" height="8" fill="#a82a22"/><rect x="206" y="28" width="4" height="72" fill="#2f3322"/><path d="M214,100 V54 Q214,44 224,44 H250 Q256,44 259,50 L268,66 V100Z" fill="#6f7b4f"/><path d="M226,50 H249 L260,66 H226Z" fill="#b9c8c4"/><rect x="224" y="48" width="38" height="50" fill="none" stroke="#424d2e" stroke-width="2"/><rect x="228" y="78" width="8" height="3" fill="#2f3322"/><polygon transform="translate(246,82) scale(.8)" points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4" fill="#a82a22"/><rect x="266" y="68" width="5" height="18" fill="#2f3322"/><path d="M267,72 H271 M267,76 H271 M267,80 H271" stroke="#6f7b4f" stroke-width="1.5"/><circle cx="268" cy="92" r="4" fill="#f1da86"/><rect x="264" y="98" width="13" height="7" fill="#3a3c2e"/><path d="M262,58 L278,52" stroke="#2f3322" stroke-width="2"/><rect x="275" y="44" width="6" height="16" rx="1" fill="#2f3322"/><path d="M34,116 A24,24 0 0 1 82,116 M82,116 A24,24 0 0 1 130,116" fill="none" stroke="#424d2e" stroke-width="4"/><path d="M218,116 A22,22 0 0 1 262,116" fill="none" stroke="#424d2e" stroke-width="4"/><g fill="#15160f"><circle cx="58" cy="116" r="22"/><circle cx="106" cy="116" r="22"/><circle cx="240" cy="116" r="22"/></g><g fill="none" stroke="#2c2d23" stroke-width="2"><circle cx="58" cy="116" r="16"/><circle cx="106" cy="116" r="16"/><circle cx="240" cy="116" r="16"/></g><g fill="#8d8d78"><circle cx="58" cy="116" r="8"/><circle cx="106" cy="116" r="8"/><circle cx="240" cy="116" r="8"/></g></g></svg><span class="cap">Головная машина</span></button>
+  <button class="item" data-id="award"><svg viewBox="0 0 120 180" aria-hidden="true"><path d="M30,0 H90 V50 L60,68 L30,50Z" fill="#9c2a22"/><path d="M60,0 V68" stroke="#e8c46a" stroke-width="3"/><rect x="48" y="62" width="24" height="14" fill="#c9a24a"/><polygon transform="translate(60,122) scale(5)" points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4" fill="#b3261e" stroke="#c9a24a" stroke-width=".8"/><circle cx="60" cy="122" r="13" fill="#e6d9b0" stroke="#c9a24a" stroke-width="2"/></svg><span class="cap">Награды</span></button>
+  <button class="item" data-id="media"><svg viewBox="0 0 240 150" aria-hidden="true"><rect x="2" y="2" width="236" height="146" rx="10" fill="#2a2d31"/><rect x="18" y="14" width="204" height="62" rx="4" fill="#e9e0c4"/><path d="M28,34 H212 M28,50 H212" stroke="#243a8c" stroke-opacity=".5"/><text x="34" y="46" font-family="Marck Script,cursive" font-size="24" fill="#243a8c">Голос памяти</text><circle cx="78" cy="104" r="20" fill="#0e0f11"/><circle cx="162" cy="104" r="20" fill="#0e0f11"/><circle cx="78" cy="104" r="9" fill="#d8d2c0"/><circle cx="162" cy="104" r="9" fill="#d8d2c0"/><path d="M60,138 H180 L170,120 H70Z" fill="#17181a"/></svg><span class="cap">Кассета памяти</span></button>
+  <button class="item" data-id="island"><svg viewBox="0 0 200 220" aria-hidden="true"><rect width="200" height="220" fill="#ece6d2"/><rect x="10" y="10" width="180" height="200" fill="none" stroke="#7d7450"/><rect x="0" y="170" width="200" height="50" fill="#6f8c9a"/><path d="M0,168 H200" stroke="#444" stroke-width="3"/><rect x="70" y="100" width="60" height="68" fill="#d3ccb8" stroke="#5a5646" stroke-width="2"/><polygon points="62,100 100,64 138,100" fill="#a49d86" stroke="#5a5646" stroke-width="2"/><rect x="98" y="34" width="4" height="28" fill="#5a5646"/><rect x="90" y="42" width="20" height="4" fill="#5a5646"/><rect x="92" y="130" width="16" height="38" rx="8" fill="#5a5646"/></svg><span class="cap">Остров Скорби</span></button>
+  <button class="item" data-id="sources"><svg viewBox="0 0 150 200" aria-hidden="true"><rect x="4" y="4" width="142" height="192" fill="#3f4d34"/><rect x="4" y="4" width="14" height="192" fill="#2c3624"/><rect x="34" y="28" width="96" height="2" fill="#d9bb62"/><polygon transform="translate(82,76) scale(3.2)" points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4" fill="#d9bb62"/><text x="82" y="138" text-anchor="middle" font-family="Old Standard TT,serif" font-weight="700" font-size="17" fill="#d9bb62">КНИГА</text><text x="82" y="158" text-anchor="middle" font-family="Old Standard TT,serif" font-weight="700" font-size="17" fill="#d9bb62">ПАМЯТИ</text></svg><span class="cap">Источники</span></button>
+</main>
+<footer><p>Просмотрено предметов: <b id="count">0</b> из <b id="total">9</b>. Все факты взяты из открытых источников, ссылки приведены в каждом разделе и на странице «Источники».</p></footer>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
+  <div class="drawer-head"><div><h2 id="dTitle"></h2><p class="sub" id="dSub"></p></div><button class="close" id="close" aria-label="Закрыть">×</button></div>
+  <div class="drawer-body" id="dBody"></div>
+</aside>
+<script>
+const SRC = {
+  kalko:  {t:"Н. Калько. «Пинчуки и пинчане: Рогаль Сергей Сергеевич», блог, 18.12.2024", u:"http://nikolajkalko.blogspot.com/2024/12/blog-post_18.html"},
+  afgan:  {t:"«РОГАЛЬ Сергей Сергеевич» — afgan.ru (по Всесоюзной и Белорусской книгам памяти)", u:"http://afgan.ru/memorial/359rogal-ss-afgan-.html", s:"Содержит выдержки из писем Рогаля родным"},
+  memory: {t:"Объекты Острова Мужества и Скорби — МГОВВА «Память»", u:"https://minskafgan.by/?page_id=2051", s:"Около 30 тысяч белорусов прошли Афганистан, 771 погиб; имена высечены на стенах часовни"},
+  wiki:   {t:"Остров Мужества и Скорби — Википедия", u:"https://ru.wikipedia.org/wiki/%D0%9E%D1%81%D1%82%D1%80%D0%BE%D0%B2_%D0%9C%D1%83%D0%B6%D0%B5%D1%81%D1%82%D0%B2%D0%B0_%D0%B8_%D0%A1%D0%BA%D0%BE%D1%80%D0%B1%D0%B8", s:"Строительство с 1988 года, прототип — храм Ефросиньи Полоцкой"},
+  island: {t:"Остров Мужества и Скорби — описание мемориала", u:"https://www.sputnik8.com/ru/minsk/sights/ostrow-muzhestwa-i-skorbi/info", s:"Строительство с 1988 года, открытие 3 августа 1996 года"},
+  island2:{t:"Остров Мужества и Скорби (Остров слёз) — komandirovka.ru", u:"https://www.komandirovka.ru/sights/minsk/m-galereya-instituta-imeni-gete/", s:"Авторы проекта и прототип храма"},
+  video:  {t:"Видео на YouTube о памяти воинов-интернационалистов", u:"https://youtu.be/F45EQVQoMh8"}
+};
+
+const mapLink = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const refs = (...keys) => keys.map(k => SRC[k]);
+
+const PANELS = {
+  portrait: {
+    title:"Сергей Сергеевич Рогаль", sub:"30.03.1966 — 23.08.1985, рядовой, водитель",
+    html: `
+      <figure class="portrait" id="portraitFig"><img src="assets/rogal.jpg" alt="Портрет Сергея Рогаля" onerror="this.closest('figure').remove()"></figure>
+      <p>Белорус, член ВЛКСМ. Родился в деревне Ласицк Пинского района, в семье швеи и тракториста. В армии стал водителем, в Афганистане возил грузы на КамАЗе.</p>
+      <div class="fact">Несколько фотографий Сергея, в том числе с другом у автомобиля, опубликованы на странице блога «Пинчуки и пинчане» (ссылка ниже).</div>`,
+    links: refs("kalko","afgan")
+  },
+  village: {
+    title:"Ласицк: откуда он родом", sub:"деревня Пинского района, Брестская область",
+    html: `
+      <ul class="tl">
+        <li><b>1966</b>родился 30 марта в д. Ласицк. Отец Сергей Николаевич — тракторист колхоза «Маяк», мать Ольга Афанасьевна — швея-мотористка комплексного приёмного пункта.</li>
+        <li><b>1983</b>окончил Ласицкую среднюю школу.</li>
+        <li><b>январь 1984</b>окончил Пинскую автомобильную школу ДОСААФ.</li>
+        <li><b>апрель 1984</b>призван в армию Пинским объединённым городским военкоматом (по Всесоюзной книге памяти — 15 апреля).</li>
+        <li><b>июль 1984</b>отправлен в Афганистан.</li>
+      </ul>
+      <div class="fact">Память на малой родине: его именем названа улица в Ласицке, в местной школе создана экспозиция. Похоронен в родной деревне.</div>
+      <div class="route"><a href="${mapLink("Ласицк Пинский район")}" target="_blank" rel="noopener">Ласицк на карте</a><a href="${mapLink("Пинск")}" target="_blank" rel="noopener">Пинск на карте</a></div>`,
+    links: refs("kalko","afgan")
+  },
+  route: {
+    title:"Дороги Афганистана", sub:"рейсы по 7–12 дней, весь день за рулём",
+    html: `
+      <p>Рогаль служил в батальоне обеспечения, расположенном в Пули-Хумри. В письме домой он перечислял города, где побывал за рейсами: Кабул, Баглан, Джелалабад, Газни, Пули-Хумри.</p>
+      <div class="route">
+        <a href="${mapLink("Kabul")}" target="_blank" rel="noopener">Кабул</a>
+        <a href="${mapLink("Pul-e Khumri")}" target="_blank" rel="noopener">Пули-Хумри</a>
+        <a href="${mapLink("Baghlan")}" target="_blank" rel="noopener">Баглан</a>
+        <a href="${mapLink("Jalalabad")}" target="_blank" rel="noopener">Джелалабад</a>
+        <a href="${mapLink("Ghazni")}" target="_blank" rel="noopener">Газни</a>
+        <a href="${mapLink("Termez")}" target="_blank" rel="noopener">Термез</a>
+      </div>
+      <p>Рейс обычно длился неделю или чуть больше, бывало и двенадцать дней. Выезжали рано утром и ехали почти целый день, потом разгрузка — и снова за руль. Колонна, в которой он ехал в тот последний рейс, шла по маршруту Кабул — Термез.</p>
+      <p class="note">Названия городов открываются на Google Картах.</p>`,
+    links: refs("kalko","afgan")
+  },
+  truck: {
+    title:"Головная машина", sub:"23 августа 1985 года",
+    html: `
+      <p>В тот день автоколонна шла по маршруту Кабул — Термез и подверглась нападению душманов. Рядовой Рогаль вёл головную машину: по белорусским источникам, с грузом снарядов. Он погиб за рулём.</p>
+      <p>Головная машина идёт впереди колонны: она первой выходит на опасный участок дороги, а остальные водители едут следом.</p>
+      <div class="fact">Ему было 19 лет. Похоронен в родной деревне Ласицк.</div>
+      <p class="note">Две книги памяти (Всесоюзная и Белорусская) совпадают в главном: вёл головную машину, погиб при нападении на колонну, награждён орденом Красной Звезды посмертно.</p>`,
+    links: refs("kalko","afgan")
+  },
+  award: {
+    title:"Награды", sub:"посмертно",
+    html: `
+      <div class="badge">
+        <svg width="64" height="64" viewBox="-12 -12 24 24" aria-hidden="true"><polygon points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4" fill="#c0342b" stroke="#f2c76b" stroke-width=".8"/></svg>
+        <div><b>Орден Красной Звезды</b><br>1989 год, за мужество и отвагу</div>
+      </div>
+      <div class="badge">
+        <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="6" width="44" height="52" fill="#a8362c" stroke="#f2c76b" stroke-width="2"/><path d="M18,20 H46 M18,30 H46 M18,40 H38" stroke="#f2c76b" stroke-width="2.5"/></svg>
+        <div><b>Грамота Президиума Верховного Совета СССР</b><br>1988 год</div>
+      </div>`,
+    links: refs("kalko","afgan")
+  },
+  letters: {
+    title:"Письма домой", sub:"по выдержкам, опубликованным в Книге памяти",
+    html: `
+      <div class="letter">«Не волнуйся за меня», — не раз писал он матери.<small>Фраза из письма; полный текст — на странице Книги памяти по ссылке ниже</small></div>
+      <p>Из опубликованных отрывков видно, как Сергей представлял свою службу. Водители в рейсах помогали друг другу, и на этом доверии держалась вся служба. Рейсы длились неделю-полторы, а за рулём он проводил целый день. Он ездил на новом КамАЗе и побывал в Кабуле, Багламе, Джелалабаде, Газни и Пули-Хумри. Рядом служили земляки из той же области.</p>
+      <p>В одном из писем он радуется, что ему исполнилось девятнадцать, и думает о том, что к двадцати годам уже будет собираться домой. Этого дня он не дождался.</p>
+      <p class="note">Это пересказ отрывков из писем, опубликованных на afgan.ru; для работы полезно сверить их с оригиналами, если они сохранились в семье.</p>`,
+    links: refs("afgan")
+  },
+  island: {
+    title:"Остров Мужества и Скорби", sub:"Минск, река Свислочь",
+    html: `
+      <p>Главный белорусский мемориал афганской войны. Строительство началось в 1988 году, открыт он 3 августа 1996 года. В центре — часовня-памятник, образцом для которой послужил первоначальный облик церкви Ефросиньи Полоцкой XII века. На стенах часовни написаны имена белорусов, павших в Афганистане.</p>
+      <div class="fact">В Афганистане служили около 30 тысяч уроженцев Беларуси. Погибли 771 человек.</div>
+      <p>15 февраля, в день, когда в 1989 году завершился вывод войск, в Беларуси отмечают День памяти воинов-интернационалистов.</p>
+      <p class="note">Данные о числе погибших в разных источниках немного различаются (771, 789 и другие цифры); здесь использованы официальные материалы 2023–2024 годов.</p>
+      <div class="route"><a href="${mapLink("Остров Мужества и Скорби Минск")}" target="_blank" rel="noopener">Мемориал на карте</a></div>`,
+    links: refs("memory","wiki","island","island2")
+  },
+  media: {
+    title:"Кассета памяти", sub:"видео о памяти воинов-интернационалистов",
+    html: `
+      <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/F45EQVQoMh8" title="Видео на YouTube" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+      <p>Если плеер не загрузился, откройте видео по ссылке ниже: она ведёт прямо на ролик.</p>`,
+    links: refs("video")
+  },
+  sources: {
+    title:"Источники", sub:"всё, на чём построен плакат",
+    html: `
+      <p>Биографические данные о Сергее Рогале совпадают в двух независимых публикациях, которые опираются на Всесоюзную и Белорусскую книги памяти. Данные о войне и мемориале — из официальных материалов и справочных страниц.</p>`,
+    links: Object.values(SRC)
+  }
+};
+
+const byId = id => document.getElementById(id);
+const viewed = new Set();
+let opener = null;
+
+function open(id, from){
+  const p = PANELS[id]; if(!p) return;
+  opener = from || document.activeElement;
+  byId("dTitle").textContent = p.title;
+  byId("dSub").textContent = p.sub || "";
+  let html = p.html;
+  if(p.links && p.links.length){
+    html += '<div class="links"><h3>Источники и ссылки</h3>' +
+      p.links.map(l => `<a href="${l.u}" target="_blank" rel="noopener">${l.t}</a>${l.s ? `<span>${l.s}</span>` : ""}`).join("") + "</div>";
+  }
+  byId("dBody").innerHTML = html;
+  byId("dBody").scrollTop = 0;
+  byId("drawer").classList.add("on"); byId("scrim").classList.add("on");
+  byId("drawer").setAttribute("aria-hidden","false");
+  viewed.add(id); refresh();
+  setTimeout(() => byId("close").focus(), 50);
+  history.replaceState(null,"","#"+id);
+}
+function close(){
+  byId("drawer").classList.remove("on"); byId("scrim").classList.remove("on");
+  byId("drawer").setAttribute("aria-hidden","true");
+  byId("dBody").innerHTML = "";
+  history.replaceState(null,"",location.pathname+location.search);
+  if(opener && opener.focus) opener.focus();
+}
+function refresh(){
+  document.querySelectorAll("[data-id]").forEach(el => el.classList.toggle("seen", viewed.has(el.dataset.id)));
+  byId("count").textContent = viewed.size;
+}
+
+document.querySelectorAll(".item").forEach(b => b.addEventListener("click", () => open(b.dataset.id, b)));
+byId("total").textContent = document.querySelectorAll(".item").length;
+byId("close").addEventListener("click", close);
+byId("scrim").addEventListener("click", close);
+document.addEventListener("keydown", e => { if(e.key==="Escape" && byId("drawer").classList.contains("on")) close(); });
+if(location.hash && PANELS[location.hash.slice(1)]) open(location.hash.slice(1));
+</script>
+</body>
+</html>
